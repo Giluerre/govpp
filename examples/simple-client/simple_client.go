@@ -30,6 +30,7 @@ import (
 	"go.fd.io/govpp/binapi/interface_types"
 	"go.fd.io/govpp/binapi/ip"
 	"go.fd.io/govpp/binapi/ip_types"
+	"go.fd.io/govpp/binapi/nat44_ed"
 	"go.fd.io/govpp/binapi/vpe"
 	"go.fd.io/govpp/core"
 )
@@ -81,13 +82,27 @@ func main() {
 	}()
 
 	// use request/reply (channel API)
-	getVppVersion(ch)
-	getSystemTime(ch)
-	idx := createLoopback(ch)
-	interfaceDump(ch)
-	addIPAddress(ch, idx)
-	ipAddressDump(ch, idx)
-	interfaceNotifications(ch, idx)
+	// getVppVersion(ch)
+	// getSystemTime(ch)
+	// idx := createLoopback(ch)
+	// interfaceDump(ch)
+	// addIPAddress(ch, idx)
+	// ipAddressDump(ch, idx)
+	// interfaceNotifications(ch, idx)
+	createNatVrfTable(ch, 1)
+}
+
+func createNatVrfTable(ch api.Channel, vrfId uint32) {
+	req := &nat44_ed.Nat44EdAddDelVrfTable{
+		TableVrfID: vrfId,
+		IsAdd:      true,
+	}
+	reply := &nat44_ed.Nat44EdAddDelVrfTableReply{}
+
+	if err := ch.SendRequest(req).ReceiveReply(reply); err != nil {
+		logError(err, "retrieving version")
+		return
+	}
 }
 
 func getVppVersion(ch api.Channel) {
